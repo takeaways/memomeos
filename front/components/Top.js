@@ -1,5 +1,5 @@
 import Reat, {useState, useCallback} from 'react';
-import {Form,Input} from 'antd';
+import {Form,Input, notification} from 'antd';
 
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -20,22 +20,22 @@ const Top = () => {
 
   const dispatch = useDispatch();
   const {me} = useSelector(state => state.user);
-  const [text, setText] = useState("");
+  const [content, setText] = useState("");
   const onChangeText = useCallback( e => setText(e.target.value),[]);
   const onSubmit = useCallback( e => {
     e.preventDefault();
+    if(!content) return shopNitification("warning","메모등록", "할 일을 적어주세요!!")
     dispatch({
       type:ADD_MEMO_REQUEST,
-      data:text,
+      data:{content},
     })
     setText("");
-    shopNitification("info","등록성공", "할 일을 합시다")
-  },[text]);
+  },[content, notification]);
 
   return (
     <div style={style}>
       <Form onSubmit={onSubmit}>
-        { me && <Input placeholder="xxx xxx xx xxx!" value={text} onChange={onChangeText}/>}
+        { me && <Input placeholder="xxx xxx xx xxx!" value={content} onChange={onChangeText}/>}
       </Form>
     </div>
   )

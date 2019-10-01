@@ -1,14 +1,22 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Head from 'next/head';
-
 import {Provider} from 'react-redux';
 import withRedux from 'next-redux-wrapper';
 import {createStore, compose, applyMiddleware} from 'redux';
 import rootReducer from '../reducers';
 
+import createSagaMiddleware from 'redux-saga';
+import withReduxSaga from 'next-redux-saga';
+import rootSaga from '../sagas'
+
+
 import AppLayout from '../components/AppLayout';
 
+
+
+
 const Main = ({Component, store}) => {
+
   return(
     <Provider store={store}>
       <Head>
@@ -26,7 +34,8 @@ const Main = ({Component, store}) => {
 }
 
 const configStore = (initialState, options) => {
-  const middlewares = [];
+  const sagaMiddleware = createSagaMiddleware();
+  const middlewares = [sagaMiddleware];
   const enhancer = process.env.NODE_ENV === 'production'
     ? compose(applyMiddleware(...middlewares))
     : compose(
@@ -35,8 +44,9 @@ const configStore = (initialState, options) => {
     window.__REDUX_DEVTOOLS_EXTENSION__() :
     (f) => f)
   const store = createStore(rootReducer, initialState, enhancer);
+  store.sagaTask = sagaMiddleware.run(rootSaga);
   return store
 }
 
 
-export default withRedux(configStore)(Main)
+export default withRedux(configStore)(withReduxSaga(Main))

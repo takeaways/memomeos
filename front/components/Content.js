@@ -1,8 +1,12 @@
-import Reat from 'react';
+import Reat,{useEffect, useState, useCallback} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {List, notification, Icon} from 'antd';
+import {List, notification, Icon, Input} from 'antd';
+
 
 import LogInForm from './LogInForm';
+import EditInput from './EditInput';
+
+import {LOAD_MAIN_MEMO_REQUEST} from '../reducers/memo';
 
 
 notification.config({
@@ -30,31 +34,32 @@ export const shopNitification = (type, title, content) => {
 
 const Content = () => {
 
+  const dispatch = useDispatch();
+
   const {memos} = useSelector(state => state.memo);
   const {me} = useSelector(state => state.user);
+
+  useEffect(()=>{
+    if(me){
+      dispatch({
+        type:LOAD_MAIN_MEMO_REQUEST,
+        data:me.id
+      })
+    }
+  },[me && me.id]);
 
 
 
   return (
     <div style={style}>
       {me ? <List
-        header={<div>홍길동님의 부지런하게 일하세요~</div>}
-        footer={<div>XXX XXX XX XX</div>}
+        header={<div>{`${me && me.nickname}님의 기록~`} <Icon title="로그아웃" type="unlock" style={{fontSize:'1.3rem',cursor:"pointer"}}/> </div>}
+        footer={<div>{`남은 할 일 ${memos.length}`}</div>}
         size="small"
         bordered
         dataSource={memos}
-        renderItem={ (item, i)  => <List.Item key={item}>
-          <div style={{display:'flex',justifyContent:"space-between", width:"100%"}}>
-            <div>
-              <span style={{fontSize:"1.3rem"}}>{i+1} ) {item}</span>
-            </div>
-            <div>
-              <Icon type="edit" title="수정" style={{cursor:"pointer", padding:"3px",fontSize:"1.3rem",verticalAlign:'middle'}}/>
-              <Icon type="delete" title="삭제" style={{cursor:"pointer",padding:"3px",fontSize:"1.3rem",verticalAlign:'middle'}}/>
-            </div>
-          </div>
-        </List.Item>}
-      /> : <LogInForm/>}
+        renderItem={ (item, i)  => <List.Item key={item.id}><EditInput memo={item}/> </List.Item>}
+        /> : <LogInForm/>}
     </div>
   )
 }
