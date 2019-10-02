@@ -50,5 +50,16 @@ router.post('/login', async (req, res, next) => {
   }
 });
 
+router.post('/logout', async (req, res, next) => {
+  try {
+    req.logout();
+    req.session.destroy();
+    res.send('logout 성공');
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+});
+
 
 module.exports = router;

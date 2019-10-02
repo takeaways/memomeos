@@ -35,7 +35,7 @@ const Top = () => {
   return (
     <div style={style}>
       <Form onSubmit={onSubmit}>
-        { me && <Input placeholder="xxx xxx xx xxx!" value={content} onChange={onChangeText}/>}
+        { me && <Input placeholder="무엇을 하기위해 오셨나요!?" value={content} onChange={onChangeText}/>}
       </Form>
     </div>
   )

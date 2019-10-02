@@ -6,7 +6,8 @@ import {List, notification, Icon, Input} from 'antd';
 import LogInForm from './LogInForm';
 import EditInput from './EditInput';
 
-import {LOAD_MAIN_MEMO_REQUEST} from '../reducers/memo';
+import {LOAD_MAIN_MEMO_REQUEST,DELETE_MEMO_REQUEST} from '../reducers/memo';
+import {LOG_OUT_REQUEST} from '../reducers/user';
 
 
 notification.config({
@@ -36,24 +37,32 @@ const Content = () => {
 
   const dispatch = useDispatch();
 
-  const {memos} = useSelector(state => state.memo);
+  const {memos, deletedMemo, editedMemo} = useSelector(state => state.memo);
   const {me} = useSelector(state => state.user);
+
+  const onLogOut = useCallback( () => {
+    dispatch({
+      type:LOG_OUT_REQUEST
+    })
+  },[])
 
   useEffect(()=>{
     if(me){
       dispatch({
         type:LOAD_MAIN_MEMO_REQUEST,
-        data:me.id
       })
     }
-  },[me && me.id]);
+    if(deletedMemo){ shopNitification("success","메모삭제", "메모를 삭제했습니다.") }
+    if(editedMemo){ shopNitification("success","메모수정", "메모를 수정했습니다.") }
+  },[me && me.id, deletedMemo && deletedMemo === true , editedMemo && editedMemo===true]);
+
 
 
 
   return (
     <div style={style}>
       {me ? <List
-        header={<div>{`${me && me.nickname}님의 기록~`} <Icon title="로그아웃" type="unlock" style={{fontSize:'1.3rem',cursor:"pointer"}}/> </div>}
+        header={<div>{`${me && me.nickname}님의 기록~`} <Icon title="로그아웃" type="unlock" style={{fontSize:'1.3rem',cursor:"pointer"}} onClick={onLogOut}/> </div>}
         footer={<div>{`남은 할 일 ${memos.length}`}</div>}
         size="small"
         bordered

@@ -6,6 +6,7 @@ export const initialState = {
   signupError:null,
   signedup:false,
   loginError:null,
+  logoutMessage:'',
 }
 
 export const LOAD_USER_REQUEST = "LOAD_USER_REQUEST";
@@ -32,12 +33,14 @@ const reducer = (state = initialState, action) => {
     case LOAD_USER_SUCCESS:{
       return{
         ...state,
-        me:action.data
+        me:action.data,
+        signedup:false,
       }
     }
     case LOAD_USER_FAILURE:{
       return{
         ...state,
+        signedup:false,
       }
     }
     case SIGN_UP_REQUEST:{
@@ -68,6 +71,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         isSigningUp:true,
         loginError:null,
+        signedup:false,
       }
     }
     case LOG_IN_SUCCESS:{
@@ -87,11 +91,15 @@ const reducer = (state = initialState, action) => {
     case LOG_OUT_REQUEST:{
       return{
         ...state,
+        logoutMessage:''
+
       }
     }
     case LOG_OUT_SUCCESS:{
       return{
         ...state,
+        logoutMessage:action.data,
+        me:null,
       }
     }
     case LOG_OUT_FAILURE:{

@@ -5,14 +5,14 @@ const router = express.Router();
 const db = require('../models');
 
 
-router.get('/:id', async (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
     if(!req.user) res.status(403).send('로그인이 필요합니다.');
     const memos = await db.Memo.findAll({
       include:{
         model:db.User,
         where:{
-          id:req.params.id
+          id:req.user.id
         }
       }
     })
@@ -47,6 +47,23 @@ router.delete('/:id', async (req, res, next) => {
       where:{id:parseInt(req.params.id)}
     });
     res.send(req.params.id);
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+});
+
+router.patch('/', async (req, res, next) => {
+  try {
+    const {id, text} = req.body
+    const memo = await db.Memo.findOne({where:{id}});
+    if(!memo) return res.status(404).send('없는 메모입니다.');
+    const editedMemo = await db.Memo.update({
+      content:text,
+    },{
+      where:{id}
+    });
+    res.send("업데이트 되었습니다.");
   } catch (e) {
     console.error(e);
     next(e);

@@ -3,7 +3,8 @@ import axios from 'axios';
 import {
   LOAD_MAIN_MEMO_REQUEST,LOAD_MAIN_MEMO_SUCCESS,LOAD_MAIN_MEMO_FAILURE,
   ADD_MEMO_REQUEST,ADD_MEMO_SUCCESS,ADD_MEMO_FAILURE,
-  DELETE_MEMO_REQUEST,DELETE_MEMO_SUCCESS,DELETE_MEMO_FAILURE
+  DELETE_MEMO_REQUEST,DELETE_MEMO_SUCCESS,DELETE_MEMO_FAILURE,
+  EDIT_MEMO_REQUEST,EDIT_MEMO_SUCCESS,EDIT_MEMO_FAILURE,
 } from '../reducers/memo';
 
 
@@ -35,15 +36,15 @@ function* watchMemo(){
 }
 
 //loadMemo
-function loadMemoAPI(id){
-  return axios.get(`/memo/${id}`, {
+function loadMemoAPI(){
+  return axios.get(`/memo/`, {
     withCredentials:true,
   })
 }
 
-function* loadMemo(action){
+function* loadMemo(){
     try{
-        const result = yield call(loadMemoAPI, action.data)
+        const result = yield call(loadMemoAPI)
         yield put({
             type:LOAD_MAIN_MEMO_SUCCESS,
             data:result.data
@@ -88,11 +89,42 @@ function* watchDelete(){
     yield takeLatest(DELETE_MEMO_REQUEST, deleteMemo)
 }
 
+//editMemo
+function editMemoAPI(editData){
+  return axios.patch(`/memo/`,editData, {
+    withCredentials:true,
+  })
+}
+
+function* editMemo(action){
+    try{
+        const result = yield call(editMemoAPI, action.data)
+        yield put({
+            type:EDIT_MEMO_SUCCESS,
+            data:{
+              id:action.data.id,
+              text:action.data.text
+            }
+        })
+    }catch(e){
+        console.error(e);
+        yield put({
+            type:EDIT_MEMO_FAILURE,
+            error:e.response.data
+        })
+    }
+}
+
+function* watchEditMemo(){
+    yield takeLatest(EDIT_MEMO_REQUEST, editMemo)
+}
+
 
 export default function* postSaga(){
     yield all([
         fork(watchMemo),
         fork(watchLoadMemo),
         fork(watchDelete),
+        fork(watchEditMemo),
     ])
 }

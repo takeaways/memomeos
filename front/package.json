@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next"
+    "dev": "next",
+    "build": "next build",
+    "prestart": "npm run build",
+    "start": "node server.js"
   },
   "author": "Geonil Jang",
   "license": "ISC",

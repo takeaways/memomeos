@@ -4,7 +4,9 @@ import {
   LOAD_USER_REQUEST,LOAD_USER_SUCCESS,LOAD_USER_FAILURE,
   SIGN_UP_REQUEST,SIGN_UP_SUCCESS,SIGN_UP_FAILURE,
   LOG_IN_REQUEST,LOG_IN_SUCCESS,LOG_IN_FAILURE,
+  LOG_OUT_REQUEST,LOG_OUT_SUCCESS,LOG_OUT_FAILURE,
 } from '../reducers/user';
+import {DELETE_MEMOS_ME} from '../reducers/memo'
 
 // load
 function loadUserAPI(){
@@ -84,11 +86,41 @@ function* watchLogin(){
     yield takeLatest(LOG_IN_REQUEST, login)
 }
 
+// logout
+function logoutAPI(){
+  return axios.post('/user/logout', {}, {
+    withCredentials:true,
+  })
+}
+
+function* logout(action){
+    try{
+        const result = yield call(logoutAPI)
+        yield put({
+            type:DELETE_MEMOS_ME,
+        })
+        yield put({
+            type:LOG_OUT_SUCCESS,
+            data:result.data
+        })
+    }catch(e){
+        yield put({
+            type:LOG_OUT_FAILURE,
+            error:e.response.data
+        })
+    }
+}
+
+function* watchLogout(){
+    yield takeLatest(LOG_OUT_REQUEST, logout)
+}
+
 
 export default function* postSaga(){
     yield all([
         fork(watchSignup),
         fork(watchLogin),
         fork(watchLoadUser),
+        fork(watchLogout),
     ])
 }
