@@ -4,7 +4,7 @@ import axios from 'axios';
 import user from './user';
 import memo from './memo';
 
-axios.defaults.baseURL = 'http://localhost:8080/api'
+axios.defaults.baseURL = 'http://api.geonil.shop/api'
 
 export default function* rootSaga(){
     yield all([
